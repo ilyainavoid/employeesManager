@@ -1,10 +1,9 @@
 package com.ilyanavoid.secondpractice.repositories;
 
-import com.ilyanavoid.secondpractice.models.Employee;
+import com.ilyanavoid.secondpractice.models.Entities.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface EmployeeRepository extends JpaRepository<Employee, UUID> {

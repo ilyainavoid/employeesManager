@@ -1,4 +1,4 @@
-package com.ilyanavoid.secondpractice.models;
+package com.ilyanavoid.secondpractice.models.Entities;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

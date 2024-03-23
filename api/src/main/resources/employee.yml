@@ -1,0 +1,134 @@
+openapi: 3.0.0
+info:
+  title: Employees Data Management API
+  description: API for managing employee data
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/employee:
+    post:
+      summary: Add a new employee
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeeDto'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDto'
+        '400':
+          description: Bad request
+    delete:
+      summary: Delete an employee
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDto'
+        '400':
+          description: Bad request
+        '404':
+          description: Employee not found
+    get:
+      summary: Get one employee
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '400':
+          description: Bad request
+        '404':
+          description: Employee not found
+    patch:
+      summary: Update an employee
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeeDto'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDto'
+        '400':
+          description: Bad request
+        '404':
+          description: Employee not found
+components:
+  schemas:
+    EmployeeDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        position:
+          type: string
+    ResponseDto:
+      type: object
+      properties:
+        message:
+          type: string
+        id:
+          type: string
+    Employee:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        position:
+          type: string

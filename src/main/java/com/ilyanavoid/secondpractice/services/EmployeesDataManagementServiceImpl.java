@@ -1,7 +1,7 @@
 package com.ilyanavoid.secondpractice.services;
 
-import com.ilyanavoid.secondpractice.models.Employee;
-import com.ilyanavoid.secondpractice.models.EmployeeDto;
+import com.ilyanavoid.secondpractice.models.Entities.Employee;
+import com.ilyanavoid.secondpractice.models.DTO.EmployeeDto;
 import com.ilyanavoid.secondpractice.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

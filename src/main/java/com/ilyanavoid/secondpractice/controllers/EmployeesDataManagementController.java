@@ -1,13 +1,15 @@
 package com.ilyanavoid.secondpractice.controllers;
 
-import com.ilyanavoid.secondpractice.models.EmployeeDto;
-import com.ilyanavoid.secondpractice.models.Employee;
-import com.ilyanavoid.secondpractice.models.EmployeeListDto;
-import com.ilyanavoid.secondpractice.models.ResponseDto;
+import com.ilyanavoid.secondpractice.models.DTO.EmployeeDto;
+import com.ilyanavoid.secondpractice.models.Entities.Employee;
+import com.ilyanavoid.secondpractice.models.DTO.EmployeeListDto;
+import com.ilyanavoid.secondpractice.models.DTO.ResponseDto;
 import com.ilyanavoid.secondpractice.repositories.EmployeeRepository;
 import com.ilyanavoid.secondpractice.services.EmployeesDataManagementService;
 import com.ilyanavoid.secondpractice.services.UtilsService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,20 +20,14 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
+@AllArgsConstructor
 public class EmployeesDataManagementController {
-    @Autowired
-    EmployeesDataManagementService employeesDataManagementService;
 
-    @Autowired
-    private EmployeeRepository employeeRepository;
+    public final EmployeesDataManagementService employeesDataManagementService;
+    public final EmployeeRepository employeeRepository;
+    public final UtilsService utilsService;
 
-    @Autowired
-    private HttpServletRequest request;
-
-    @Autowired
-    private UtilsService utilsService;
-
-    @PostMapping("api/add")
+    @PostMapping("api/employee")
     public ResponseEntity addEmployee(@RequestBody EmployeeDto employee) {
         UUID id = null;
         if (employee.getId() != null && !utilsService.isUUID(employee.getId())) {
@@ -47,7 +43,7 @@ public class EmployeesDataManagementController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
         }
     }
-    @GetMapping("api/get")
+    @GetMapping("api/employees")
     public ResponseEntity getAllEmployees(@RequestParam(required = false) String name, @RequestParam(required = false) String position) {
         try {
             List<Employee> list = employeesDataManagementService.getAllEmployees(name, position);
@@ -59,26 +55,18 @@ public class EmployeesDataManagementController {
         }
     }
 
-    @DeleteMapping("api/delete")
-    public ResponseEntity deleteEmployee(@RequestParam(required = true) String id) {
+    @DeleteMapping("api/employee")
+    public ResponseEntity deleteEmployee(@RequestParam(required = true) String id, @RequestHeader(name="Authorization") UUID authorization) {
         UUID deleted = null;
         if (!utilsService.isUUID(id)) {
             return ResponseEntity.badRequest().body("Incorrect id!");
         }
 
-        String authorizationHeader = request.getHeader("Authorization");
-        String bearerToken = null;
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            bearerToken = authorizationHeader.substring(7);
-        } else {
+        if(!utilsService.isUUID(authorization.toString())) {
             return ResponseEntity.badRequest().body("Incorrect authorization header!");
         }
 
-        if(!utilsService.isUUID(bearerToken)) {
-            return ResponseEntity.badRequest().body("Incorrect authorization header!");
-        }
-
-        Employee requestSender = employeeRepository.getById(UUID.fromString(bearerToken));
+        Employee requestSender = employeeRepository.getById(authorization);
         if (requestSender.getPosition().equals("Admin")) {
             try {
                 deleted = employeesDataManagementService.deleteEmployee(id);
@@ -91,7 +79,7 @@ public class EmployeesDataManagementController {
         }
         else {
             try {
-                deleted = employeesDataManagementService.deleteEmployee(bearerToken);
+                deleted = employeesDataManagementService.deleteEmployee(authorization.toString());
                 ResponseDto response = new ResponseDto("DELETED", deleted);
                 return ResponseEntity.ok(response);
             } catch (Exception e) {
@@ -101,24 +89,17 @@ public class EmployeesDataManagementController {
         }
     }
 
-    @GetMapping("/api/getone")
-    public ResponseEntity getOneEmployee(@RequestParam(required = true) String id) {
+    @GetMapping("/api/employee")
+    public ResponseEntity getOneEmployee(@RequestParam(required = true) String id, @RequestHeader(name="Authorization") UUID authorization) {
         if (!utilsService.isUUID(id)) {
             return ResponseEntity.badRequest().body("Incorrect id!");
         }
-        String authorizationHeader = request.getHeader("Authorization");
-        String bearerToken = null;
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            bearerToken = authorizationHeader.substring(7);
-        } else {
+
+        if(!utilsService.isUUID(authorization.toString())) {
             return ResponseEntity.badRequest().body("Incorrect authorization header!");
         }
 
-        if(!utilsService.isUUID(bearerToken)) {
-            return ResponseEntity.badRequest().body("Incorrect authorization header!");
-        }
-
-        Optional<Employee> requestSenderOpt = employeeRepository.findById(UUID.fromString(bearerToken));
+        Optional<Employee> requestSenderOpt = employeeRepository.findById(authorization);
         if (requestSenderOpt.isPresent()) {
             Employee requestSender = requestSenderOpt.get();
             if (requestSender.getPosition().equals("Admin")) {
@@ -139,24 +120,17 @@ public class EmployeesDataManagementController {
         }
     }
 
-    @PatchMapping("/api/update")
-    public ResponseEntity updateEmployee(@RequestParam(required = true) String id, @RequestBody EmployeeDto data) {
+    @PatchMapping("/api/employee")
+    public ResponseEntity updateEmployee(@RequestParam(required = true) String id, @RequestBody EmployeeDto data, @RequestHeader(name="Authorization") UUID authorization) {
         if (!utilsService.isUUID(id)) {
             return ResponseEntity.badRequest().body("Incorrect id!");
         }
-        String authorizationHeader = request.getHeader("Authorization");
-        String bearerToken = null;
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            bearerToken = authorizationHeader.substring(7);
-        } else {
+
+        if(!utilsService.isUUID(authorization.toString())) {
             return ResponseEntity.badRequest().body("Incorrect authorization header!");
         }
 
-        if(!utilsService.isUUID(bearerToken)) {
-            return ResponseEntity.badRequest().body("Incorrect authorization header!");
-        }
-
-        Optional<Employee> requestSenderOpt = employeeRepository.findById(UUID.fromString(bearerToken));
+        Optional<Employee> requestSenderOpt = employeeRepository.findById(authorization);
         if (requestSenderOpt.isPresent()) {
             Employee requestSender = requestSenderOpt.get();
             if (requestSender.getPosition().equals("Admin")) {
@@ -170,7 +144,7 @@ public class EmployeesDataManagementController {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
                 }
             } else {
-                UUID target = employeesDataManagementService.updateEmployee(bearerToken, data);
+                UUID target = employeesDataManagementService.updateEmployee(authorization.toString(), data);
                 ResponseDto response = new ResponseDto("UPDATED", target);
                 if (target != null) return ResponseEntity.ok(response);
                 else return ResponseEntity.notFound().build();

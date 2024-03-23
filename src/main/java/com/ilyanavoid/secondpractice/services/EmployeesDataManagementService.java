@@ -1,7 +1,7 @@
 package com.ilyanavoid.secondpractice.services;
 
-import com.ilyanavoid.secondpractice.models.Employee;
-import com.ilyanavoid.secondpractice.models.EmployeeDto;
+import com.ilyanavoid.secondpractice.models.Entities.Employee;
+import com.ilyanavoid.secondpractice.models.DTO.EmployeeDto;
 
 import java.util.List;
 import java.util.UUID;
